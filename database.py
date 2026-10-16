@@ -30,9 +30,21 @@ async def ensure_collection(client: AsyncQdrantClient) -> None:
         )
 
 
-def _point_id(filename: str, index: int) -> str:
+async def recreate_collection(client: AsyncQdrantClient) -> None:
+    """Drop and recreate the collection so re-indexes do not leave stale points."""
+    collections = await client.get_collections()
+    if COLLECTION_NAME in {collection.name for collection in collections.collections}:
+        await client.delete_collection(collection_name=COLLECTION_NAME)
+    await client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
+    )
+
+
+def _point_id(filename: str) -> str:
+    # Stable per image so re-indexing upserts the same point.
     # Qdrant accepts unsigned ints or UUIDs only (not raw hex digests).
-    return str(uuid.uuid5(_POINT_NAMESPACE, f"{filename}:{index}"))
+    return str(uuid.uuid5(_POINT_NAMESPACE, filename))
 
 
 async def upsert_embeddings(
@@ -44,11 +56,11 @@ async def upsert_embeddings(
         raise ValueError("Each embedding must have one metadata record")
     points = [
         PointStruct(
-            id=_point_id(str(item.get("filename", "unknown")), index),
+            id=_point_id(str(item.get("filename", "unknown"))),
             vector=vector.tolist(),
             payload=dict(item),
         )
-        for index, (vector, item) in enumerate(zip(embeddings, metadata))
+        for vector, item in zip(embeddings, metadata)
     ]
     if points:
         await client.upsert(collection_name=COLLECTION_NAME, points=points)
@@ -64,6 +76,19 @@ async def search_embeddings(
         with_payload=True,
     )
     return [
-        {"image_path": point.payload.get("image_path"), "score": point.score}
+        {
+            "image_path": point.payload.get("image_path"),
+            "filename": point.payload.get("filename"),
+            "media_url": point.payload.get("media_url")
+            or (
+                f"/media/{point.payload['filename']}.jpg"
+                if point.payload.get("filename")
+                else None
+            ),
+            "score": point.score,
+            "class": point.payload.get("class"),
+            "modality": point.payload.get("modality"),
+            "source": point.payload.get("source"),
+        }
         for point in response.points
     ]
