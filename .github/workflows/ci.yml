@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lint (ruff check)
+        run: uv run ruff check MedClip_pipeline/ tests/
+
+      - name: Format check (ruff format)
+        run: uv run ruff format --check MedClip_pipeline/ tests/
+
+      - name: Run tests
+        run: |
+          uv run pytest tests/ -v \
+            --ignore=tests/test_embeddings.py \
+            --ignore=tests/test_mlops.py
+        # test_embeddings.py and test_mlops.py (model inference tests) are
+        # excluded from CI: the marqo-fashionSigLIP weights require ~3 GB
+        # of network download and are not suitable for ephemeral CI runners.
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -af
+          df -h
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Dry-run Docker build
+        run: docker compose -f docker/docker-compose.yml build api
