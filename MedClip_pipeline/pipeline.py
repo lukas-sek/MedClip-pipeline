@@ -79,7 +79,9 @@ async def run(pages: int, search_text: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="MedClip-pipeline Vinted scraper pipeline")
+    parser = argparse.ArgumentParser(
+        description="MedClip-pipeline Vinted scraper pipeline"
+    )
     parser.add_argument(
         "--pages", type=int, default=1, help="Number of catalog pages to fetch"
     )

@@ -199,7 +199,9 @@ async def run(batch_size: int) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="MedClip-pipeline Phase 2 embedding pipeline")
+    parser = argparse.ArgumentParser(
+        description="MedClip-pipeline Phase 2 embedding pipeline"
+    )
     parser.add_argument(
         "--batch-size",
         type=int,

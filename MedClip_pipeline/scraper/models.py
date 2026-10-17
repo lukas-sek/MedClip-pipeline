@@ -189,4 +189,3 @@ class VintedItem(BaseModel):
             "image_url": url,
             "category": _extract_category(data),
         }
-
