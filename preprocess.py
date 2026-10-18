@@ -44,12 +44,16 @@ def embed_images(
 ) -> np.ndarray:
     if not images:
         return np.empty((0, EMBEDDING_DIM), dtype=np.float32)
-    inputs = torch.stack([processor.image_transform(image) for image in images]).to(device)
+    inputs = torch.stack([processor.image_transform(image) for image in images]).to(
+        device
+    )
     with torch.inference_mode():
         features = model.encode_image(inputs)
     embeddings = _normalize(features)
     if embeddings.shape[1] != EMBEDDING_DIM:
-        raise RuntimeError(f"Expected {EMBEDDING_DIM} dimensions, got {embeddings.shape[1]}")
+        raise RuntimeError(
+            f"Expected {EMBEDDING_DIM} dimensions, got {embeddings.shape[1]}"
+        )
     return embeddings
 
 
@@ -87,5 +91,7 @@ def embed_text(
         features = model.encode_text(inputs)
     embedding = _normalize(features)[0]
     if embedding.shape != (EMBEDDING_DIM,):
-        raise RuntimeError(f"Expected {EMBEDDING_DIM} dimensions, got {embedding.shape[0]}")
+        raise RuntimeError(
+            f"Expected {EMBEDDING_DIM} dimensions, got {embedding.shape[0]}"
+        )
     return embedding

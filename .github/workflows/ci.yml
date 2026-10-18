@@ -26,19 +26,13 @@ jobs:
         run: uv sync --frozen
 
       - name: Lint (ruff check)
-        run: uv run ruff check MedClip_pipeline/ tests/
+        run: uv run ruff check main.py preprocess.py load_frames.py stream_index.py database.py tests/
 
       - name: Format check (ruff format)
-        run: uv run ruff format --check MedClip_pipeline/ tests/
+        run: uv run ruff format --check main.py preprocess.py load_frames.py stream_index.py database.py tests/
 
       - name: Run tests
-        run: |
-          uv run pytest tests/ -v \
-            --ignore=tests/test_embeddings.py \
-            --ignore=tests/test_mlops.py
-        # test_embeddings.py and test_mlops.py (model inference tests) are
-        # excluded from CI: the marqo-fashionSigLIP weights require ~3 GB
-        # of network download and are not suitable for ephemeral CI runners.
+        run: uv run pytest tests/ -v
 
       - name: Free up disk space
         run: |

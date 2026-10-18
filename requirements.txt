@@ -1,5 +1,4 @@
 torch
-torchvision
 transformers
 open-clip-torch
 opencv-python
@@ -10,3 +9,6 @@ qdrant-client
 pillow
 numpy
 pydantic
+python-dotenv
+pytest
+pytest-asyncio

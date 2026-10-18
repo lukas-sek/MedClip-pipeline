@@ -60,16 +60,14 @@ Example queries: `melanoma`, `basal cell carcinoma`, `dermatoscopic image of act
 ## Project layout
 
 ```
-main.py                 FastAPI app (POST /search, UI, /media)
-preprocess.py           BiomedCLIP load + embed helpers
-load_frames.py          Local frame/tile loader CLI
-stream_index.py         HF stream → embed → Qdrant + image cache
-database.py             Async Qdrant client helpers
-web/                    Browser search UI
-docker/                 Compose (Qdrant, Postgres, optional API image)
-MedClip_pipeline/       Additional recommendation/scraper package
-frontend/               Expo client for that package
-tests/                  Unit/integration tests
+main.py           FastAPI app (POST /search, UI, /media)
+preprocess.py     BiomedCLIP load + embed helpers
+load_frames.py    Local frame/tile loader CLI
+stream_index.py   HF stream → embed → Qdrant + image cache
+database.py       Async Qdrant client helpers
+web/              Browser search UI
+docker/           Compose (Qdrant + optional API image)
+tests/            Lightweight unit tests
 ```
 
 ## Design notes
@@ -82,10 +80,8 @@ tests/                  Unit/integration tests
 ## Tests & CI
 
 ```bash
-uv run pytest tests/ -v --ignore=tests/test_embeddings.py --ignore=tests/test_mlops.py
+uv run pytest tests/ -v
 ```
-
-Heavyweight model-download tests are skipped in CI; see `.github/workflows/ci.yml`.
 
 ## License / data
 

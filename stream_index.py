@@ -96,7 +96,7 @@ async def stream_and_index(
     indexed = 0
     try:
         if replace:
-            print(f"Recreating Qdrant collection so only cached images remain ...")
+            print("Recreating Qdrant collection so only cached images remain ...")
             await recreate_collection(client)
         else:
             from database import ensure_collection

@@ -76,8 +76,7 @@ def summarize(input_dir: Path, limit: int | None) -> int:
     if not samples:
         extensions = ", ".join(sorted(IMAGE_EXTENSIONS))
         print(
-            f"No supported images found in '{input_dir}'. "
-            f"Expected: {extensions}",
+            f"No supported images found in '{input_dir}'. Expected: {extensions}",
             file=sys.stderr,
         )
         return 1

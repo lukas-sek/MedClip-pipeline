@@ -23,7 +23,9 @@ def get_client() -> AsyncQdrantClient:
 
 async def ensure_collection(client: AsyncQdrantClient) -> None:
     collections = await client.get_collections()
-    if COLLECTION_NAME not in {collection.name for collection in collections.collections}:
+    if COLLECTION_NAME not in {
+        collection.name for collection in collections.collections
+    }:
         await client.create_collection(
             collection_name=COLLECTION_NAME,
             vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
